@@ -1,5 +1,6 @@
 
 from flask import Flask
+import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
@@ -11,6 +12,7 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     db.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)

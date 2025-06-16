@@ -1,0 +1,24 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ lesson.title }}</h2>
+
+<p>{{ lesson.description }}</p>
+
+{% if lesson.video_url %}
+  <div class="video-wrapper">
+    <iframe src="{{ lesson.video_url }}" frameborder="0" allowfullscreen></iframe>
+  </div>
+{% endif %}
+
+{% if lesson.files %}
+  <h3>Resources:</h3>
+  <ul>
+  {% for file in lesson.files %}
+    <li><a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">{{ file.filename }}</a></li>
+  {% endfor %}
+  </ul>
+{% endif %}
+
+<p><a href="{{ url_for('main.category_view', category_id=lesson.category.id) }}">Back to Category</a></p>
+{% endblock %}

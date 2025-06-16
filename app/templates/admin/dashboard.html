@@ -1,0 +1,87 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<div class="admin-actions">
+  <a href="{{ url_for('admin.new_category') }}" class="button">➕ New Category</a>
+  <a href="{{ url_for('admin.new_lesson') }}" class="button">➕ New Lesson</a>
+</div>
+
+<form method="get" action="{{ url_for('admin.admin_home') }}" class="filter-form">
+  <input type="text" name="search" value="{{ search }}" placeholder="Search lessons..." class="search-bar">
+  <select name="category_id" class="filter-dropdown">
+    <option value="0">All Categories</option>
+    {% for cat in categories %}
+      <option value="{{ cat.id }}" {% if cat.id == category_id %}selected{% endif %}>{{ cat.name }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="button small">Filter</button>
+</form>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th><a href="{{ url_for('admin.admin_home', search=search, category_id=category_id, sort='title', direction='asc' if direction=='desc' else 'desc') }}">Title {% if sort=='title' %}{{ '↑' if direction=='asc' else '↓' }}{% endif %}</a></th>
+      <th>Category</th>
+      <th>Files</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for lesson in lessons %}
+    <tr id="lesson-row-{{ lesson.id }}">
+      <td>{{ lesson.title }}</td>
+      <td>{{ lesson.category.name }}</td>
+      <td style="word-break: break-word; max-width: 300px;">
+        {% for file in lesson.files %}
+          <div id="file-{{ file.id }}">
+          {{ file.filename }}
+          <button class="tiny-delete" onclick="deleteFile({{ file.id }})">🗑</button>
+          </div>
+        {% endfor %}
+      </td>
+      <td>
+        <div class="admin-buttons">
+          <a href="{{ url_for('admin.edit_lesson', lesson_id=lesson.id) }}" class="button tiny">Edit</a>
+          <button class="button tiny red" onclick="deleteLesson({{ lesson.id }})">Delete</button>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="pagination">
+  {% if pagination.has_prev %}
+    <a href="{{ url_for('admin.admin_home', page=pagination.prev_num, search=search, category_id=category_id, sort=sort, direction=direction) }}">« Prev</a>
+  {% endif %}
+  Page {{ pagination.page }} of {{ pagination.pages }}
+  {% if pagination.has_next %}
+    <a href="{{ url_for('admin.admin_home', page=pagination.next_num, search=search, category_id=category_id, sort=sort, direction=direction) }}">Next »</a>
+  {% endif %}
+</div>
+
+<script>
+async function deleteLesson(lesson_id) {
+  if (!confirm("Are you sure you want to delete this lesson?")) return;
+  const res = await fetch(`/admin/ajax/lesson/delete/${lesson_id}`, { method: "POST" });
+  if (res.ok) {
+    document.getElementById("lesson-row-" + lesson_id).remove();
+  } else {
+    alert("Failed to delete lesson");
+  }
+}
+
+async function deleteFile(file_id) {
+  if (!confirm("Delete this file?")) return;
+  const res = await fetch(`/admin/ajax/file/delete/${file_id}`, { method: "POST" });
+  if (res.ok) {
+    document.getElementById("file-" + file_id).remove();
+  } else {
+    alert("Failed to delete file");
+  }
+}
+</script>
+
+{% endblock %}

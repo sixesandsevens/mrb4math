@@ -1,0 +1,122 @@
+
+body {
+    background-color: #6e7764;
+    color: #1e1e1e;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.header-bar {
+    background-color: #e8b18c;
+    padding: 1rem;
+    text-align: center;
+}
+.header-image {
+    width: 100%;
+    max-width: 744px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+.navbar {
+    background-color: #c49067;
+    padding: 0.5rem;
+    text-align: center;
+}
+.navbar a {
+    color: #fff;
+    margin: 0 10px;
+    text-decoration: none;
+}
+.container {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+}
+h1, h2, h3 {
+    color: #432818;
+}
+.admin-actions {
+    margin-bottom: 1rem;
+}
+.button {
+    background-color: #5c3d2e;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-right: 0.5rem;
+    font-weight: bold;
+    display: inline-block;
+}
+.button:hover {
+    background-color: #432818;
+}
+.button.tiny {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.85rem;
+}
+.button.tiny.red {
+    background-color: #aa3a3a;
+}
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.search-bar {
+    flex-grow: 2;
+    padding: 0.5rem;
+    min-width: 200px;
+}
+.filter-dropdown {
+    padding: 0.5rem;
+}
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+.admin-table th, .admin-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+    text-align: left;
+}
+.admin-table td:nth-child(3) {
+    word-break: break-word;
+    max-width: 300px;
+}
+.admin-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.tiny-delete {
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    color: #aa3a3a;
+    cursor: pointer;
+}
+.pagination {
+    margin-top: 1rem;
+    text-align: center;
+}
+.pagination a {
+    padding: 0.3rem 0.7rem;
+    background-color: #5c3d2e;
+    color: white;
+    margin: 0 3px;
+    border-radius: 3px;
+    text-decoration: none;
+}
+.video-wrapper iframe {
+    width: 100%;
+    min-height: 400px;
+    margin: 1rem 0;
+}

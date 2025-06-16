@@ -1,0 +1,81 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Pytest
+.pytest_cache/
+
+# Flask stuff
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Flask-Migrate
+migrations/
+
+# Environment variables
+.env
+*.env
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Other system files
+Thumbs.db
+ehthumbs.db
+.idea/
+
+# Static/uploads (optional, depending if you want to version them)
+# static/uploads/
+# static/images/uploads/
+
+# Python virtual environment (if not in standard venv/)
+.venv/
+
+# PyCharm
+.idea/
+*.iml
+
+# System files
+*.swp
+*.swo
+*~

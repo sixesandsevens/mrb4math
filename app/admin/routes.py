@@ -15,6 +15,7 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 # Admin-only decorator
 def admin_required(f):
+    from functools import wraps
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
@@ -25,6 +26,7 @@ def admin_required(f):
 # Dashboard
 @admin_bp.route('/')
 @login_required
+@admin_required
 def admin_home():
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search', '', type=str)
@@ -44,7 +46,10 @@ def admin_home():
 
     pagination = query.paginate(page=page, per_page=10)
     lessons = pagination.items
+
+    # THIS IS THE FIX: fetch all categories, not just those with lessons
     categories = Category.query.order_by(Category.name).all()
+
     return render_template('admin/dashboard.html', lessons=lessons,
                            pagination=pagination, categories=categories,
                            search=search, category_id=category_id,

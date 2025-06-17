@@ -17,6 +17,20 @@
   </select>
   <button type="submit" class="button small">Filter</button>
 </form>
+<h3>Manage Categories:</h3>
+<ul>
+  {% for cat in categories %}
+    <li>
+      {{ cat.name }}
+      {% if cat.lessons|length == 0 %}
+      <form action="{{ url_for('admin.delete_category', category_id=cat.id) }}" method="post" style="display:inline;">
+        <button class="tiny-delete" onclick="return confirm('Delete this empty category?')">🗑</button>
+      </form>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+
 
 <table class="admin-table">
   <thead>

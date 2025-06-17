@@ -7,7 +7,7 @@ app = create_app()
 with app.app_context():
     username = "admin"
     email = "chris.tanton86@gmail.com"
-    password = "Accordion9497!"
+    password = "Password123"
 
     existing = User.query.filter_by(username=username).first()
     if existing:

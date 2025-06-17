@@ -37,14 +37,14 @@
         {% for file in lesson.files %}
           <div id="file-{{ file.id }}">
           {{ file.filename }}
-          <button class="tiny-delete" onclick="deleteFile({{ file.id }})">🗑</button>
+          <button class="tiny-delete" onclick="deleteFile('{{ file.id }}')">🗑</button>
           </div>
         {% endfor %}
       </td>
       <td>
         <div class="admin-buttons">
           <a href="{{ url_for('admin.edit_lesson', lesson_id=lesson.id) }}" class="button tiny">Edit</a>
-          <button class="button tiny red" onclick="deleteLesson({{ lesson.id }})">Delete</button>
+          <button class="button tiny red" onclick="deleteLesson('{{ lesson.id }}')">Delete</button>
         </div>
       </td>
     </tr>

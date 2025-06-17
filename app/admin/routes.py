@@ -1,23 +1,28 @@
-
 import os
 import time
 import re
+from functools import wraps
+
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify
-from flask_login import login_required
+from flask_login import login_required, current_user
 from sqlalchemy import asc, desc
 from werkzeug.utils import secure_filename
-from ..models.models import db, Category, Lesson, LessonFile
+
+from ..models.models import db, Category, Lesson, LessonFile, User
 from ..forms.forms import CategoryForm, LessonForm
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-def safe_filename(filename):
-    filename = secure_filename(filename)
-    timestamp = int(time.time())
-    name, ext = os.path.splitext(filename)
-    name = re.sub(r'[^A-Za-z0-9_-]', '_', name)
-    return f"{name}_{timestamp}{ext}"
+# Admin-only decorator
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return "Forbidden", 403
+        return f(*args, **kwargs)
+    return decorated_function
 
+# Dashboard
 @admin_bp.route('/')
 @login_required
 def admin_home():
@@ -45,6 +50,15 @@ def admin_home():
                            search=search, category_id=category_id,
                            sort=sort, direction=direction)
 
+# File sanitization helper
+def safe_filename(filename):
+    filename = secure_filename(filename)
+    timestamp = int(time.time())
+    name, ext = os.path.splitext(filename)
+    name = re.sub(r'[^A-Za-z0-9_-]', '_', name)
+    return f"{name}_{timestamp}{ext}"
+
+# Category Management
 @admin_bp.route('/category/new', methods=['GET', 'POST'])
 @login_required
 def new_category():
@@ -57,9 +71,9 @@ def new_category():
         return redirect(url_for('admin.admin_home'))
     return render_template('admin/new_category.html', form=form)
 
+# Lesson Management
 def lesson_form(lesson, form):
-    form.category.choices = [(c.id, c.name) for c in
-                             Category.query.order_by(Category.name)]
+    form.category.choices = [(c.id, c.name) for c in Category.query.order_by(Category.name)]
     if form.validate_on_submit():
         lesson.title = form.title.data
         lesson.description = form.description.data
@@ -90,6 +104,7 @@ def edit_lesson(lesson_id):
     form = LessonForm(obj=lesson)
     return lesson_form(lesson, form)
 
+# File Delete (traditional form)
 @admin_bp.route('/file/delete/<int:file_id>', methods=['POST'])
 @login_required
 def delete_file(file_id):
@@ -102,8 +117,7 @@ def delete_file(file_id):
     db.session.commit()
     return redirect(url_for('admin.edit_lesson', lesson_id=lesson_id))
 
-# New AJAX delete routes below:
-
+# AJAX Delete Routes (with CSRF protection added in JS)
 @admin_bp.route('/ajax/file/delete/<int:file_id>', methods=['POST'])
 @login_required
 def ajax_delete_file(file_id):
@@ -126,3 +140,48 @@ def ajax_delete_lesson(lesson_id):
     db.session.delete(lesson)
     db.session.commit()
     return jsonify({'success': True})
+
+# User Management Routes (NEW)
+@admin_bp.route('/users')
+@login_required
+@admin_required
+def user_list():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    users = User.query.order_by(User.username).paginate(page=page, per_page=per_page)
+    return render_template('admin/user_list.html', users=users)
+
+@admin_bp.route('/user/<int:user_id>/promote')
+@login_required
+@admin_required
+def promote_user(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_admin = True
+    db.session.commit()
+    flash(f'{user.username} promoted to admin.', 'success')
+    return redirect(url_for('admin.user_list'))
+
+@admin_bp.route('/user/<int:user_id>/demote')
+@login_required
+@admin_required
+def demote_user(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_admin = False
+    db.session.commit()
+    flash(f'{user.username} demoted.', 'success')
+    return redirect(url_for('admin.user_list'))
+
+@admin_bp.route('/category/edit/<int:category_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_category(category_id):
+    category = Category.query.get_or_404(category_id)
+    form = CategoryForm(obj=category)
+
+    if form.validate_on_submit():
+        category.name = form.name.data.strip()
+        db.session.commit()
+        flash('Category updated.', 'success')
+        return redirect(url_for('admin.admin_home'))
+
+    return render_template('admin/edit_category.html', form=form, category=category)

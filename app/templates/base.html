@@ -17,11 +17,13 @@
     <a href="{{ url_for('main.home') }}">Home</a> |
     <a href="{{ url_for('main.about') }}">About</a>
     {% if current_user.is_authenticated %}
-        | <a href="{{ url_for('admin.admin_home') }}">Admin</a>
-        | <a href="{{ url_for('auth.logout') }}">Logout</a>
-    {% else %}
-        | <a href="{{ url_for('auth.login') }}">Login</a>
-    {% endif %}
+  | <a href="{{ url_for('admin.admin_home') }}">Admin</a>
+  | <a href="{{ url_for('admin.user_list') }}">Users</a>
+  | <a href="{{ url_for('auth.logout') }}">Logout</a>
+{% else %}
+  | <a href="{{ url_for('auth.login') }}">Login</a>
+  | <a href="{{ url_for('auth.register') }}">Register</a>
+{% endif %}
 </nav>
 </header>
 <main class="container">

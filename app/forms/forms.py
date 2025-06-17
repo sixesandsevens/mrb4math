@@ -1,7 +1,7 @@
-
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectField, FileField, PasswordField, MultipleFileField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms import StringField, TextAreaField, SelectField, FileField, PasswordField, MultipleFileField, SubmitField
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
+from ..models.models import User
 
 MAX_FILE_SIZE_MB = 10
 
@@ -24,3 +24,20 @@ class LessonForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=50)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Register')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('Username is already taken.')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('Email is already registered.')

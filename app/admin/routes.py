@@ -61,6 +61,7 @@ def safe_filename(filename):
 # Category Management
 @admin_bp.route('/category/new', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def new_category():
     form = CategoryForm()
     if form.validate_on_submit():
@@ -70,6 +71,36 @@ def new_category():
         flash('Category added.')
         return redirect(url_for('admin.admin_home'))
     return render_template('admin/new_category.html', form=form)
+
+@admin_bp.route('/category/edit/<int:category_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_category(category_id):
+    category = Category.query.get_or_404(category_id)
+    form = CategoryForm(obj=category)
+
+    if form.validate_on_submit():
+        category.name = form.name.data.strip()
+        db.session.commit()
+        flash('Category updated.')
+        return redirect(url_for('admin.admin_home'))
+
+    return render_template('admin/edit_category.html', form=form, category=category)
+
+@admin_bp.route('/category/delete/<int:category_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_category(category_id):
+    category = Category.query.get_or_404(category_id)
+
+    if category.lessons:
+        flash('Cannot delete category with existing lessons.', 'danger')
+        return redirect(url_for('admin.admin_home'))
+
+    db.session.delete(category)
+    db.session.commit()
+    flash('Category deleted successfully.', 'success')
+    return redirect(url_for('admin.admin_home'))
 
 # Lesson Management
 def lesson_form(lesson, form):
@@ -141,7 +172,7 @@ def ajax_delete_lesson(lesson_id):
     db.session.commit()
     return jsonify({'success': True})
 
-# User Management Routes (NEW)
+# User Management Routes
 @admin_bp.route('/users')
 @login_required
 @admin_required
@@ -170,18 +201,3 @@ def demote_user(user_id):
     db.session.commit()
     flash(f'{user.username} demoted.', 'success')
     return redirect(url_for('admin.user_list'))
-
-@admin_bp.route('/category/edit/<int:category_id>', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def edit_category(category_id):
-    category = Category.query.get_or_404(category_id)
-    form = CategoryForm(obj=category)
-
-    if form.validate_on_submit():
-        category.name = form.name.data.strip()
-        db.session.commit()
-        flash('Category updated.', 'success')
-        return redirect(url_for('admin.admin_home'))
-
-    return render_template('admin/edit_category.html', form=form, category=category)

@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% block content %}
 <h2>Admin Dashboard</h2>
@@ -96,22 +95,6 @@ async function deleteFile(file_id) {
     document.getElementById("file-" + file_id).remove();
   } else {
     alert("Failed to delete file");
-  }
-}
-
-async function deleteCategory(category_id) {
-  if (!confirm("Are you sure you want to delete this category?")) return;
-  const res = await fetch(`/admin/ajax/category/delete/${category_id}`, {
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': getCSRFToken()
-    }
-  });
-  if (res.ok) {
-    document.getElementById("category-row-" + category_id).remove();
-  } else {
-    alert("Failed to delete category");
   }
 }
 </script>

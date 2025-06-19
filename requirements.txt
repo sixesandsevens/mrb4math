@@ -5,4 +5,5 @@ Flask-SQLAlchemy
 Flask-Login
 Werkzeug
 click
-email-validator
+email_validator
+Flask-Migrate

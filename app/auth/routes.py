@@ -15,7 +15,9 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password_hash, form.password.data):
             login_user(user)
-            return redirect(url_for('admin.admin_home'))
+            if user.is_admin:
+                return redirect(url_for('admin.admin_home'))
+            return redirect(url_for('main.home'))
         else:
             flash('Invalid username or password')
     return render_template('login.html', form=form)

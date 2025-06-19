@@ -128,6 +128,7 @@ def lesson_form(lesson, form):
 
 @admin_bp.route('/lesson/new', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def new_lesson():
     form = LessonForm()
     lesson = Lesson()
@@ -135,6 +136,7 @@ def new_lesson():
 
 @admin_bp.route('/lesson/edit/<int:lesson_id>', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def edit_lesson(lesson_id):
     lesson = Lesson.query.get_or_404(lesson_id)
     form = LessonForm(obj=lesson)
@@ -143,6 +145,7 @@ def edit_lesson(lesson_id):
 # File Delete (traditional form)
 @admin_bp.route('/file/delete/<int:file_id>', methods=['POST'])
 @login_required
+@admin_required
 def delete_file(file_id):
     file = LessonFile.query.get_or_404(file_id)
     lesson_id = file.lesson_id
@@ -156,6 +159,7 @@ def delete_file(file_id):
 # AJAX Delete Routes (with CSRF protection added in JS)
 @admin_bp.route('/ajax/file/delete/<int:file_id>', methods=['POST'])
 @login_required
+@admin_required
 def ajax_delete_file(file_id):
     file = LessonFile.query.get_or_404(file_id)
     file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
@@ -167,6 +171,7 @@ def ajax_delete_file(file_id):
 
 @admin_bp.route('/ajax/lesson/delete/<int:lesson_id>', methods=['POST'])
 @login_required
+@admin_required
 def ajax_delete_lesson(lesson_id):
     lesson = Lesson.query.get_or_404(lesson_id)
     for file in lesson.files:

@@ -14,8 +14,16 @@
 
 {% if lesson.files %}
   <h3>Resources:</h3>
-  {% set files_by_title = lesson.files|selectattr('display_name')|groupby('display_name') %}
-  {% for title, group in files_by_title %}
+  {% set grouped = namespace(data={}, others=[]) %}
+  {% for file in lesson.files %}
+    {% if file.display_name %}
+      {% set _ = grouped.data.setdefault(file.display_name, []).append(file) %}
+    {% else %}
+      {% set _ = grouped.others.append(file) %}
+    {% endif %}
+  {% endfor %}
+
+  {% for title, group in grouped.data.items() %}
     <div class="resource-card" style="margin-bottom: 1rem; padding: 1rem; background: #eee; border-radius: 0.5rem;">
       <strong>{{ title }}</strong><br>
       {% for file in group %}
@@ -23,6 +31,12 @@
           {{ file.file_type|capitalize }}
         </a>{% if not loop.last %} &nbsp;|&nbsp; {% endif %}
       {% endfor %}
+    </div>
+  {% endfor %}
+
+  {% for file in grouped.others %}
+    <div class="resource-card" style="margin-bottom: 1rem; padding: 1rem; background: #eee; border-radius: 0.5rem;">
+      <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">{{ file.filename }}</a>
     </div>
   {% endfor %}
 {% endif %}

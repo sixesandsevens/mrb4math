@@ -4,6 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from ..forms.forms import LoginForm, RegisterForm
 from ..models.models import User
 from .. import db
+from sqlalchemy.exc import SQLAlchemyError
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -39,9 +40,13 @@ def register():
             password_hash=hashed_password,
             is_admin=False
         )
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Account created successfully. You can now log in.', 'success')
-        return redirect(url_for('auth.login'))
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Account created successfully. You can now log in.', 'success')
+            return redirect(url_for('auth.login'))
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash('An error occurred while creating your account.', 'danger')
     
     return render_template('register.html', form=form)

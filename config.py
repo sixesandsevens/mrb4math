@@ -8,8 +8,10 @@ class Config:
 
     #: Secret key used for session management and CSRF protection
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'your_secret_key_here'
+    
     #: Path to the SQLite database file
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///mrb4math.db'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://sixesandsevens:Accordion9497!@sixesandsevens.mysql.pythonanywhere-services.com/sixesandsevens$mrb4math'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     #: Base path for uploaded lesson resources
     UPLOAD_FOLDER = os.path.join(os.getcwd(), 'app', 'static', 'uploads')

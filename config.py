@@ -14,4 +14,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     #: Base path for uploaded lesson resources
-    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'app', 'static', 'uploads')
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'uploads')

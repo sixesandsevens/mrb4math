@@ -10,7 +10,8 @@ from flask_login import login_required, current_user
 from sqlalchemy import asc, desc
 from werkzeug.utils import secure_filename
 
-from ..models.models import db, Category, Lesson, LessonFile, User
+from .. import db
+from ..models.models import Category, Lesson, LessonFile, User
 from ..forms.forms import CategoryForm, LessonForm
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')

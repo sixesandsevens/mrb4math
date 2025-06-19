@@ -2,6 +2,7 @@
 
 from flask_wtf.file import FileAllowed
 from flask_wtf import FlaskForm
+import os
 from wtforms import (
     StringField,
     TextAreaField,
@@ -20,8 +21,13 @@ MAX_FILE_SIZE_MB = 10
 def file_size_limit(form, field):
     """Validate that uploaded files do not exceed ``MAX_FILE_SIZE_MB``."""
     for file in field.data:
-        if file and len(file.read()) > MAX_FILE_SIZE_MB * 1024 * 1024:
-            raise ValidationError(f'File size cannot exceed {MAX_FILE_SIZE_MB} MB.')
+        if not file:
+            continue
+        file.seek(0, os.SEEK_END)
+        if file.tell() > MAX_FILE_SIZE_MB * 1024 * 1024:
+            raise ValidationError(
+                f'File size cannot exceed {MAX_FILE_SIZE_MB} MB.'
+            )
         file.seek(0)
 
 class CategoryForm(FlaskForm):

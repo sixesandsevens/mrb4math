@@ -1,9 +1,15 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectField, FileField, PasswordField, MultipleFileField, SubmitField
+from wtforms import (
+    StringField,
+    TextAreaField,
+    SelectField,
+    FileField,
+    PasswordField,
+    MultipleFileField,
+    SubmitField,
+)
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
 from ..models.models import User
-from flask_wtf import FlaskForm
-from wtforms import SubmitField
 
 MAX_FILE_SIZE_MB = 10
 

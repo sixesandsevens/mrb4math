@@ -1,3 +1,8 @@
+"""Command-line utilities for managing the application.
+
+Run commands using ``python manage.py <command>``.
+"""
+
 from flask.cli import FlaskGroup
 from werkzeug.security import generate_password_hash
 from app import create_app, db
@@ -8,7 +13,7 @@ cli = FlaskGroup(app)
 
 @cli.command("create-user")
 def create_user():
-    """Create a new user via input prompts."""
+    """Interactive command to create an admin user."""
     username = input("Username: ")
     password = input("Password: ")
     email = input("Email: ")

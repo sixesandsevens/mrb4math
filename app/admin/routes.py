@@ -1,3 +1,5 @@
+"""Administrative routes for managing users, categories and lessons."""
+
 import os
 import time
 import re
@@ -15,6 +17,8 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 # Admin-only decorator
 def admin_required(f):
+    """Ensure the current user is logged in and has admin rights."""
+
     from functools import wraps
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -28,6 +32,8 @@ def admin_required(f):
 @login_required
 @admin_required
 def admin_home():
+    """Render the admin dashboard with lesson listings."""
+
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search', '', type=str)
     category_id = request.args.get('category_id', 0, type=int)
@@ -47,7 +53,7 @@ def admin_home():
     pagination = query.paginate(page=page, per_page=10)
     lessons = pagination.items
 
-    # THIS IS THE FIX: fetch all categories, not just those with lessons
+    # Fetch all categories, not just those with lessons
     categories = Category.query.order_by(Category.name).all()
 
     return render_template('admin/dashboard.html', lessons=lessons,
@@ -57,6 +63,8 @@ def admin_home():
 
 # File sanitization helper
 def safe_filename(filename):
+    """Generate a safe unique filename for uploaded files."""
+
     filename = secure_filename(filename)
     timestamp = int(time.time())
     name, ext = os.path.splitext(filename)
@@ -68,6 +76,8 @@ def safe_filename(filename):
 @login_required
 @admin_required
 def new_category():
+    """Create a new lesson category."""
+
     form = CategoryForm()
     if form.validate_on_submit():
         category = Category(name=form.name.data.strip())
@@ -81,6 +91,8 @@ def new_category():
 @login_required
 @admin_required
 def edit_category(category_id):
+    """Edit an existing lesson category."""
+
     category = Category.query.get_or_404(category_id)
     form = CategoryForm(obj=category)
 
@@ -96,6 +108,8 @@ def edit_category(category_id):
 @login_required
 @admin_required
 def delete_category(category_id):
+    """Remove a category if it has no associated lessons."""
+
     category = Category.query.get_or_404(category_id)
 
     if category.lessons:
@@ -109,6 +123,8 @@ def delete_category(category_id):
 
 # Lesson Management
 def lesson_form(lesson, form):
+    """Populate lesson fields from a form and persist changes."""
+
     form.category.choices = [(c.id, c.name) for c in Category.query.order_by(Category.name)]
     if form.validate_on_submit():
         lesson.title = form.title.data
@@ -130,6 +146,8 @@ def lesson_form(lesson, form):
 @login_required
 @admin_required
 def new_lesson():
+    """Create a new lesson entry."""
+
     form = LessonForm()
     lesson = Lesson()
     return lesson_form(lesson, form)
@@ -138,6 +156,8 @@ def new_lesson():
 @login_required
 @admin_required
 def edit_lesson(lesson_id):
+    """Edit an existing lesson."""
+
     lesson = Lesson.query.get_or_404(lesson_id)
     form = LessonForm(obj=lesson)
     return lesson_form(lesson, form)
@@ -147,6 +167,8 @@ def edit_lesson(lesson_id):
 @login_required
 @admin_required
 def delete_file(file_id):
+    """Delete a file associated with a lesson via form submission."""
+
     file = LessonFile.query.get_or_404(file_id)
     lesson_id = file.lesson_id
     file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
@@ -161,6 +183,8 @@ def delete_file(file_id):
 @login_required
 @admin_required
 def ajax_delete_file(file_id):
+    """AJAX endpoint to delete a lesson file."""
+
     file = LessonFile.query.get_or_404(file_id)
     file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
     if os.path.exists(file_path):
@@ -173,6 +197,8 @@ def ajax_delete_file(file_id):
 @login_required
 @admin_required
 def ajax_delete_lesson(lesson_id):
+    """AJAX endpoint to delete an entire lesson."""
+
     lesson = Lesson.query.get_or_404(lesson_id)
     for file in lesson.files:
         file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
@@ -187,6 +213,8 @@ def ajax_delete_lesson(lesson_id):
 @login_required
 @admin_required
 def user_list():
+    """List all registered users."""
+
     page = request.args.get('page', 1, type=int)
     per_page = 10
     users = User.query.order_by(User.username).paginate(page=page, per_page=per_page)
@@ -196,6 +224,8 @@ def user_list():
 @login_required
 @admin_required
 def promote_user(user_id):
+    """Grant admin rights to a user."""
+
     user = User.query.get_or_404(user_id)
     user.is_admin = True
     db.session.commit()
@@ -206,6 +236,8 @@ def promote_user(user_id):
 @login_required
 @admin_required
 def demote_user(user_id):
+    """Revoke a user's admin rights."""
+
     user = User.query.get_or_404(user_id)
     user.is_admin = False
     db.session.commit()

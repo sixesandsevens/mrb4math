@@ -1,3 +1,9 @@
+"""Utility script to create or update the initial admin user.
+
+Edit the ``username``, ``email`` and ``password`` variables below as needed
+and run ``python bootstrap_admin.py`` once during setup.
+"""
+
 from app import create_app, db
 from app.models.models import User
 from werkzeug.security import generate_password_hash

@@ -1,7 +1,10 @@
+"""Database models for the application."""
+
 from .. import db
 from flask_login import UserMixin
 
 class User(UserMixin, db.Model):
+    """Site user account."""
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
@@ -9,10 +12,12 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
 class Category(db.Model):
+    """Logical grouping of lessons."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
 
 class Lesson(db.Model):
+    """Educational lesson with optional resources."""
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -23,6 +28,7 @@ class Lesson(db.Model):
     files = db.relationship('LessonFile', backref='lesson', cascade="all, delete-orphan", lazy=True)
 
 class LessonFile(db.Model):
+    """File attached to a lesson (worksheet or answer key)."""
     display_name = db.Column(db.String(200), nullable=True)
     file_type = db.Column(db.String(50), nullable=True)  # 'worksheet' or 'answer_key'
     id = db.Column(db.Integer, primary_key=True)

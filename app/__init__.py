@@ -1,3 +1,5 @@
+"""Factory for creating the Flask application and initializing extensions."""
+
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -11,6 +13,8 @@ login_manager = LoginManager()
 migrate = Migrate()
 
 def create_app():
+    """Create the Flask application instance."""
+
     app = Flask(__name__)
     app.config.from_object('config.Config')
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -32,6 +36,8 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
+        """Return the user instance for Flask-Login."""
+
         return User.query.get(int(user_id))
 
     with app.app_context():

@@ -26,7 +26,21 @@ def lesson_view(lesson_id):
     """Display details for a single lesson."""
 
     lesson = Lesson.query.get_or_404(lesson_id)
-    return render_template('lesson.html', lesson=lesson)
+
+    grouped_files = {}
+    other_files = []
+    for file in lesson.files:
+        if file.display_name:
+            grouped_files.setdefault(file.display_name, []).append(file)
+        else:
+            other_files.append(file)
+
+    return render_template(
+        'lesson.html',
+        lesson=lesson,
+        grouped_files=grouped_files,
+        other_files=other_files,
+    )
 
 @main_bp.route('/uploads/<filename>')
 def download_file(filename):

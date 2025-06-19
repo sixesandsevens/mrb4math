@@ -20,16 +20,16 @@ def create_admin():
         if existing:
             print("Updating existing admin user...")
             existing.email = email
-            existing.password_hash = generate_password_hash(password)
+            existing.set_password(password)
             existing.is_admin = True
         else:
             print("Creating new admin user...")
             user = User(
                 username=username,
                 email=email,
-                password_hash=generate_password_hash(password),
                 is_admin=True
             )
+            user.set_password(password)
             db.session.add(user)
 
         db.session.commit()

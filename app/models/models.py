@@ -23,6 +23,8 @@ class Lesson(db.Model):
     files = db.relationship('LessonFile', backref='lesson', cascade="all, delete-orphan", lazy=True)
 
 class LessonFile(db.Model):
+    display_name = db.Column(db.String(200), nullable=True)
+    file_type = db.Column(db.String(50), nullable=True)  # 'worksheet' or 'answer_key'
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(500), nullable=False)
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'), nullable=False)

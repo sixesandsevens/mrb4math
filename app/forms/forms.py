@@ -57,3 +57,10 @@ class RegisterForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     submit = SubmitField('Delete')
+
+
+class LessonFileUploadForm(FlaskForm):
+    display_name = StringField("Display Title", validators=[DataRequired()])
+    worksheet_file = FileField("Worksheet PDF", validators=[FileAllowed(['pdf'])])
+    answer_key_file = FileField("Answer Key PDF", validators=[FileAllowed(['pdf'])])
+    submit = SubmitField("Upload Resources")

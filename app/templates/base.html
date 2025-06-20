@@ -6,12 +6,16 @@
 
     <!-- Prevent FOUC: Hide page until CSS is applied -->
     <style>
-        body { visibility: hidden; }
+            body {
+    visibility: hidden;
+    background-color: #6e7764; /* or match your main body background */
+    }
     </style>
 
     <!-- Load and apply stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"
-          onload="document.body.style.visibility='visible'">
+      onload="document.body.style.visibility='visible'; document.body.classList.add('visible');">
+
 
     <!-- Fallback for users with JavaScript disabled -->
     <noscript>

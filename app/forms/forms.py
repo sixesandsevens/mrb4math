@@ -9,8 +9,9 @@ from wtforms import (
     SelectField,
     FileField,
     PasswordField,
-    MultipleFileField,
     SubmitField,
+    FieldList,
+    FormField,
 )
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
 from ..models.models import User
@@ -20,13 +21,18 @@ MAX_FILE_SIZE_MB = 10
 
 def file_size_limit(form, field):
     """Validate that uploaded files do not exceed ``MAX_FILE_SIZE_MB``."""
-    for file in field.data:
+    files = field.data
+    if files is None:
+        return
+    if not isinstance(files, (list, tuple)):
+        files = [files]
+    for file in files:
         if not file:
             continue
         file.seek(0, os.SEEK_END)
         if file.tell() > MAX_FILE_SIZE_MB * 1024 * 1024:
             raise ValidationError(
-                f'File size cannot exceed {MAX_FILE_SIZE_MB} MB.'
+                f"File size cannot exceed {MAX_FILE_SIZE_MB} MB."
             )
         file.seek(0)
 
@@ -35,6 +41,23 @@ class CategoryForm(FlaskForm):
 
     name = StringField('Category Name', validators=[DataRequired()])
 
+class LessonFileUploadForm(FlaskForm):
+    """Form for uploading worksheet and answer key files."""
+
+    class Meta:
+        csrf = False
+
+    display_name = StringField("Display Title", validators=[DataRequired()])
+    worksheet_file = FileField(
+        "Worksheet PDF",
+        validators=[FileAllowed(['pdf']), file_size_limit],
+    )
+    answer_key_file = FileField(
+        "Answer Key PDF",
+        validators=[FileAllowed(['pdf']), file_size_limit],
+    )
+
+
 class LessonForm(FlaskForm):
     """Form used by administrators to manage lessons."""
 
@@ -42,8 +65,9 @@ class LessonForm(FlaskForm):
     description = TextAreaField('Description')
     video_url = StringField('Vimeo URL')
     category = SelectField('Category', coerce=int)
-    pdf_files = MultipleFileField('Upload Worksheets & Answer Keys', validators=[file_size_limit])
+    files = FieldList(FormField(LessonFileUploadForm), min_entries=1)
     submit = SubmitField('Save Lesson')
+
 
 class LoginForm(FlaskForm):
     """Authentication form for existing users."""
@@ -74,12 +98,3 @@ class DeleteForm(FlaskForm):
     """Confirmation form for delete operations."""
 
     submit = SubmitField('Delete')
-
-
-class LessonFileUploadForm(FlaskForm):
-    """Form for uploading worksheet and answer key files."""
-
-    display_name = StringField("Display Title", validators=[DataRequired()])
-    worksheet_file = FileField("Worksheet PDF", validators=[FileAllowed(['pdf'])])
-    answer_key_file = FileField("Answer Key PDF", validators=[FileAllowed(['pdf'])])
-    submit = SubmitField("Upload Resources")

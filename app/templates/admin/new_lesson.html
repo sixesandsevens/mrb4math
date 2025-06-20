@@ -5,7 +5,6 @@
 
   <form method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
-    {{ upload_form.hidden_tag() }}
 
     <p>
       {{ form.title.label }}<br>
@@ -31,23 +30,53 @@
 
     <h4>Upload Resources</h4>
 
-    <p>
-      {{ upload_form.display_name.label }}<br>
-      {{ upload_form.display_name(class="form-control") }}
-    </p>
+    <div id="files">
+      {% for subform in form.files %}
+      <div class="file-entry" style="margin-bottom:1rem;">
+        <p>
+          {{ subform.display_name.label }}<br>
+          {{ subform.display_name(class="form-control") }}
+        </p>
 
-    <p>
-      {{ upload_form.worksheet_file.label }}<br>
-      {{ upload_form.worksheet_file(class="form-control") }}
-    </p>
+        <p>
+          {{ subform.worksheet_file.label }}<br>
+          {{ subform.worksheet_file(class="form-control") }}
+        </p>
 
-    <p>
-      {{ upload_form.answer_key_file.label }}<br>
-      {{ upload_form.answer_key_file(class="form-control") }}
-    </p>
+        <p>
+          {{ subform.answer_key_file.label }}<br>
+          {{ subform.answer_key_file(class="form-control") }}
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <button type="button" id="add-file" class="button tiny">Add Resource</button>
 
     <p>
       {{ form.submit(class="btn btn-primary") }}
     </p>
   </form>
+
+  <script>
+  const addBtn = document.getElementById('add-file');
+  addBtn.addEventListener('click', function () {
+    const container = document.getElementById('files');
+    const index = container.children.length;
+    const template = container.children[0].cloneNode(true);
+    template.querySelectorAll('input').forEach(function (input) {
+      const name = input.name.replace(/files-\d+-/, `files-${index}-`);
+      input.name = name;
+      input.id = name;
+      input.value = '';
+    });
+    template.querySelectorAll('label').forEach(function (label) {
+      const htmlFor = label.getAttribute('for');
+      if (htmlFor) {
+        label.setAttribute('for', htmlFor.replace(/files-\d+-/, `files-${index}-`));
+      }
+    });
+    container.appendChild(template);
+  });
+  </script>
 {% endblock %}

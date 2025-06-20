@@ -5,10 +5,17 @@
 <p>{{ lesson.description }}</p>
 
 {% if lesson.video_url %}
-  <div class="video-wrapper">
-    <iframe src="{{ lesson.video_url }}" frameborder="0" allowfullscreen></iframe>
+  {% set vimeo_id = lesson.video_url.split('/')[-1].split('?')[0] %}
+  <div class="video-wrapper" style="aspect-ratio: 16/9;">
+    <iframe
+      src="https://player.vimeo.com/video/{{ vimeo_id }}"
+      frameborder="0"
+      allow="autoplay; fullscreen"
+      allowfullscreen
+    ></iframe>
   </div>
 {% endif %}
+
 
 {% if lesson.files %}
   <h3>Resources:</h3>
@@ -21,16 +28,18 @@
     {% endif %}
   {% endfor %}
 
-  {% for title, group in grouped.data.items() %}
-    <div class="resource-card" style="margin-bottom: 1rem; padding: 1rem; background: #eee; border-radius: 0.5rem;">
-      <strong>{{ title }}</strong><br>
-      {% for file in group %}
-        <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">
-          {{ file.file_type|capitalize }}
-        </a>{% if not loop.last %} &nbsp;|&nbsp; {% endif %}
-      {% endfor %}
-    </div>
-  {% endfor %}
+{% for title, group in grouped.data.items() %}
+  <div class="resource-card" style="margin-bottom: 1rem; padding: 1rem; background: #eee; border-radius: 0.5rem;">
+    <strong>{{ title }}</strong><br>
+    {% for file in group %}
+      {% if file.file_type == 'worksheet' %}
+        📄 <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">Worksheet</a><br>
+      {% elif file.file_type == 'answer_key' %}
+        ✅ <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">Answer Key</a><br>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endfor %} 
 
   {% for file in grouped.others %}
     <div class="resource-card" style="margin-bottom: 1rem; padding: 1rem; background: #eee; border-radius: 0.5rem;">

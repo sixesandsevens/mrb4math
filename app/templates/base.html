@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>MrB4Math</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Prevent FOUC: Hide page until CSS is applied -->
+    <style>
+        body { visibility: hidden; }
+    </style>
+
+    <!-- Load and apply stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"
+          onload="document.body.style.visibility='visible'">
+
+    <!-- Fallback for users with JavaScript disabled -->
+    <noscript>
+        <style>
+            body { visibility: visible; }
+        </style>
+    </noscript>
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>

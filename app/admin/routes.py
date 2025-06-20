@@ -29,7 +29,7 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Dashboard
+# Admin dashboard
 @admin_bp.route('/')
 @login_required
 @admin_required
@@ -63,7 +63,7 @@ def admin_home():
                            search=search, category_id=category_id,
                            sort=sort, direction=direction)
 
-# File sanitization helper
+# File name sanitization helper
 def safe_filename(filename):
     """Generate a safe unique filename for uploaded files."""
 
@@ -73,7 +73,7 @@ def safe_filename(filename):
     name = re.sub(r'[^A-Za-z0-9_-]', '_', name)
     return f"{name}_{timestamp}{ext}"
 
-# Category Management
+# Category management
 @admin_bp.route('/category/new', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -123,7 +123,7 @@ def delete_category(category_id):
     flash('Category deleted successfully.', 'success')
     return redirect(url_for('admin.admin_home'))
 
-# Lesson Management
+# Lesson management
 
 @admin_bp.route('/lesson/new', methods=['GET', 'POST'])
 @login_required
@@ -157,7 +157,7 @@ def lesson_form(lesson, form):
         db.session.add(lesson)
         db.session.flush()  # Ensure lesson.id is available
 
-        # Handle resource upload
+        # Handle worksheet and answer key uploads
         for subform in form.files.entries:
             if (
                 not subform.worksheet_file.data
@@ -196,7 +196,7 @@ def lesson_form(lesson, form):
     return render_template('admin/new_lesson.html', form=form, lesson=lesson)
 
 
-# File Delete (traditional form)
+# File delete via traditional form submission
 @admin_bp.route('/file/delete/<int:file_id>', methods=['POST'])
 @login_required
 @admin_required
@@ -212,7 +212,7 @@ def delete_file(file_id):
     db.session.commit()
     return redirect(url_for('admin.edit_lesson', lesson_id=lesson_id))
 
-# AJAX Delete Routes (with CSRF protection added in JS)
+# AJAX delete routes (client-side includes CSRF token)
 @admin_bp.route('/ajax/file/delete/<int:file_id>', methods=['POST'])
 @login_required
 @admin_required
@@ -242,7 +242,7 @@ def ajax_delete_lesson(lesson_id):
     db.session.commit()
     return jsonify({'success': True})
 
-# User Management Routes
+# User management routes
 @admin_bp.route('/users')
 @login_required
 @admin_required

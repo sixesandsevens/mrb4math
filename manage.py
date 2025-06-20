@@ -26,7 +26,8 @@ def create_user():
         username=username,
         email=email,
         password_hash=generate_password_hash(password),
-        is_admin=True  # You can toggle this
+        # Set to ``True`` to grant admin privileges to the created user
+        is_admin=True
     )
     db.session.add(user)
     db.session.commit()

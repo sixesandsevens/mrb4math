@@ -1,10 +1,10 @@
 """Administrative routes for managing users, categories and lessons."""
 
+
 import os
 import time
 import re
-from app.forms.forms import LessonFileUploadForm
-from ..forms.forms import LessonForm, CategoryForm, LessonFileUploadForm
+from app.forms.forms import LessonForm, CategoryForm, LessonFileUploadForm
 from functools import wraps
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify
 from flask_login import login_required, current_user
@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 
 from .. import db
 from ..models.models import Category, Lesson, LessonFile, User
-from ..forms.forms import CategoryForm, LessonForm
+
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 

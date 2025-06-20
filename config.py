@@ -20,3 +20,8 @@ class Config:
 
     #: Folder where uploaded lesson resources are stored
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'uploads')
+
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280
+    }

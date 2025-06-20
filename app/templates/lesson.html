@@ -16,7 +16,6 @@
   </div>
 {% endif %}
 
-
 {% if lesson.files %}
   <h3>Resources:</h3>
   {% set grouped = namespace(data={}, others=[]) %}
@@ -28,24 +27,29 @@
     {% endif %}
   {% endfor %}
 
-{% for title, group in grouped.data.items() %}
-  <div class="resource-card" style="margin-bottom: 1rem; padding: 1rem; background: #eee; border-radius: 0.5rem;">
-    <strong>{{ title }}</strong><br>
-    {% for file in group %}
-      {% if file.file_type == 'worksheet' %}
-        📄 <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">Worksheet</a><br>
-      {% elif file.file_type == 'answer_key' %}
-        ✅ <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">Answer Key</a><br>
-      {% endif %}
-    {% endfor %}
-  </div>
-{% endfor %} 
-
-  {% for file in grouped.others %}
+  {% for title, group in grouped.data.items() %}
     <div class="resource-card" style="margin-bottom: 1rem; padding: 1rem; background: #eee; border-radius: 0.5rem;">
-      <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">{{ file.filename }}</a>
+      <strong>{{ title }}</strong><br>
+      {% for file in group %}
+        {% if file.file_type == 'worksheet' %}
+          📄 <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">Worksheet</a><br>
+        {% elif file.file_type == 'answer_key' %}
+          ✅ <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">Answer Key</a><br>
+        {% else %}
+          📎 <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">{{ file.filename }}</a><br>
+        {% endif %}
+      {% endfor %}
     </div>
   {% endfor %}
+
+  {% if grouped.others %}
+    <h4>Other Files:</h4>
+    {% for file in grouped.others %}
+      <div class="resource-card" style="margin-bottom: 0.5rem; background: #f7f7f7; padding: 0.5rem; border-radius: 0.5rem;">
+        📎 <a href="{{ url_for('main.download_file', filename=file.filename) }}" target="_blank">{{ file.filename }}</a>
+      </div>
+    {% endfor %}
+  {% endif %}
 {% endif %}
 
 <p><a href="{{ url_for('main.category_view', category_id=lesson.category.id) }}">Back to Category</a></p>

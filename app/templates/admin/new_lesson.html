@@ -1,31 +1,53 @@
+{% extends "base.html" %}
 
-{% extends 'base.html' %}
 {% block content %}
-<h2>{% if lesson %}Edit{% else %}Add New{% endif %} Lesson</h2>
+  <h2>{% if lesson.id %}Edit Lesson{% else %}New Lesson{% endif %}</h2>
 
-<form method="POST" enctype="multipart/form-data" class="form-box">
-  {{ form.hidden_tag() }}
-  <div class="form-field">{{ form.title.label }}<br>{{ form.title() }}</div>
-  <div class="form-field">{{ form.description.label }}<br>{{ form.description() }}</div>
-  <div class="form-field">{{ form.video_url.label }}<br>{{ form.video_url() }}</div>
-  <div class="form-field">{{ form.category.label }}<br>{{ form.category() }}</div>
-  <div class="form-field">{{ form.pdf_files.label }}<br>{{ form.pdf_files(multiple=true) }}</div>
-  <small>(Max file size: 10MB per file)</small>
-  <br><br>
-  <input type="submit" value="Save Lesson" class="button">
-</form>
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    {{ upload_form.hidden_tag() }}
 
-{% if lesson and lesson.files %}
-  <h3>Existing Uploaded Files:</h3>
-  <ul>
-  {% for file in lesson.files %}
-    <li>
-      {{ file.filename }}
-      <form method="POST" action="{{ url_for('admin.delete_file', file_id=file.id) }}" style="display:inline;">
-        <button type="submit" class="button" onclick="return confirm('Delete file?')">🗑</button>
-      </form>
-    </li>
-  {% endfor %}
-  </ul>
-{% endif %}
+    <p>
+      {{ form.title.label }}<br>
+      {{ form.title(class="form-control") }}
+    </p>
+
+    <p>
+      {{ form.description.label }}<br>
+      {{ form.description(class="form-control") }}
+    </p>
+
+    <p>
+      {{ form.video_url.label }}<br>
+      {{ form.video_url(class="form-control") }}
+    </p>
+
+    <p>
+      {{ form.category.label }}<br>
+      {{ form.category(class="form-control") }}
+    </p>
+
+    <hr>
+
+    <h4>Upload Resources</h4>
+
+    <p>
+      {{ upload_form.display_name.label }}<br>
+      {{ upload_form.display_name(class="form-control") }}
+    </p>
+
+    <p>
+      {{ upload_form.worksheet_file.label }}<br>
+      {{ upload_form.worksheet_file(class="form-control") }}
+    </p>
+
+    <p>
+      {{ upload_form.answer_key_file.label }}<br>
+      {{ upload_form.answer_key_file(class="form-control") }}
+    </p>
+
+    <p>
+      {{ form.submit(class="btn btn-primary") }}
+    </p>
+  </form>
 {% endblock %}

@@ -123,45 +123,72 @@ def delete_category(category_id):
     return redirect(url_for('admin.admin_home'))
 
 # Lesson Management
-def lesson_form(lesson, form):
-    """Populate lesson fields from a form and persist changes."""
-
-    form.category.choices = [(c.id, c.name) for c in Category.query.order_by(Category.name)]
-    if form.validate_on_submit():
-        lesson.title = form.title.data
-        lesson.description = form.description.data
-        lesson.video_url = form.video_url.data
-        lesson.category_id = form.category.data
-        for file in form.pdf_files.data:
-            if file:
-                filename = safe_filename(file.filename)
-                path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-                file.save(path)
-                lesson.files.append(LessonFile(filename=filename))
-        db.session.add(lesson)
-        db.session.commit()
-        return redirect(url_for('admin.admin_home'))
-    return render_template('admin/new_lesson.html', form=form, lesson=lesson)
 
 @admin_bp.route('/lesson/new', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def new_lesson():
     """Create a new lesson entry."""
-
     form = LessonForm()
+    upload_form = LessonFileUploadForm()
     lesson = Lesson()
-    return lesson_form(lesson, form)
+    return lesson_form(lesson, form, upload_form)
+
 
 @admin_bp.route('/lesson/edit/<int:lesson_id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def edit_lesson(lesson_id):
     """Edit an existing lesson."""
-
     lesson = Lesson.query.get_or_404(lesson_id)
     form = LessonForm(obj=lesson)
-    return lesson_form(lesson, form)
+    upload_form = LessonFileUploadForm()
+    return lesson_form(lesson, form, upload_form)
+
+
+def lesson_form(lesson, form, upload_form=None):
+    """Populate lesson fields from form and optionally upload resources."""
+    form.category.choices = [(c.id, c.name) for c in Category.query.order_by(Category.name)]
+
+    if form.validate_on_submit():
+        lesson.title = form.title.data
+        lesson.description = form.description.data
+        lesson.video_url = form.video_url.data
+        lesson.category_id = form.category.data
+        db.session.add(lesson)
+        db.session.flush()  # Ensure lesson.id is available
+
+        # Handle resource upload
+        if upload_form and upload_form.validate_on_submit():
+            display_name = upload_form.display_name.data.strip()
+
+            if upload_form.worksheet_file.data:
+                worksheet = upload_form.worksheet_file.data
+                filename = safe_filename(worksheet.filename)
+                path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                worksheet.save(path)
+                lesson.files.append(LessonFile(
+                    filename=filename,
+                    display_name=display_name,
+                    file_type='worksheet'
+                ))
+
+            if upload_form.answer_key_file.data:
+                answer_key = upload_form.answer_key_file.data
+                filename = safe_filename(answer_key.filename)
+                path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                answer_key.save(path)
+                lesson.files.append(LessonFile(
+                    filename=filename,
+                    display_name=display_name,
+                    file_type='answer_key'
+                ))
+
+        db.session.commit()
+        return redirect(url_for('admin.admin_home'))
+
+    return render_template('admin/new_lesson.html', form=form, lesson=lesson, upload_form=upload_form or LessonFileUploadForm())
+
 
 # File Delete (traditional form)
 @admin_bp.route('/file/delete/<int:file_id>', methods=['POST'])

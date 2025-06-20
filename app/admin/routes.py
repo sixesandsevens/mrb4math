@@ -3,8 +3,8 @@
 import os
 import time
 import re
+from ..forms.forms import LessonForm, CategoryForm, LessonFileUploadForm
 from functools import wraps
-
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import asc, desc
@@ -160,7 +160,8 @@ def lesson_form(lesson, form, upload_form=None):
 
         # Handle resource upload
         if upload_form and upload_form.validate_on_submit():
-            display_name = upload_form.display_name.data.strip()
+            display_name = upload_form.display_name.data.strip() or filename
+
 
             if upload_form.worksheet_file.data:
                 worksheet = upload_form.worksheet_file.data

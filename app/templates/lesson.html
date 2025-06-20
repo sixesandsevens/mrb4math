@@ -21,7 +21,9 @@
   {% set grouped = namespace(data={}, others=[]) %}
   {% for file in lesson.files %}
     {% if file.display_name %}
-      {% set _ = grouped.data.setdefault(file.display_name, []).append(file) %}
+      {% set name = file.display_name or file.filename %}
+{% set _ = grouped.data.setdefault(name, []).append(file) %}
+
     {% else %}
       {% set _ = grouped.others.append(file) %}
     {% endif %}

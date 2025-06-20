@@ -43,6 +43,7 @@ class LessonForm(FlaskForm):
     video_url = StringField('Vimeo URL')
     category = SelectField('Category', coerce=int)
     pdf_files = MultipleFileField('Upload Worksheets & Answer Keys', validators=[file_size_limit])
+    submit = SubmitField('Save Lesson')
 
 class LoginForm(FlaskForm):
     """Authentication form for existing users."""

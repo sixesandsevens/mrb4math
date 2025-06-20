@@ -3,6 +3,7 @@
 import os
 import time
 import re
+from app.forms.forms import LessonFileUploadForm
 from ..forms.forms import LessonForm, CategoryForm, LessonFileUploadForm
 from functools import wraps
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify

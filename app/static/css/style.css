@@ -7,9 +7,13 @@ body {
     padding: 0;
 }
 .header-bar {
-    background-color: #e8b18c;
+    background-image: url('/static/images/woodgrain-banner.png');
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    background-position: top center;
     padding: 1rem;
     text-align: center;
+
 }
 .header-image {
     width: 100%;
@@ -17,7 +21,9 @@ body {
     height: auto;
     display: block;
     margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
 .navbar {
     background-color: #c49067;
     padding: 0.5rem;

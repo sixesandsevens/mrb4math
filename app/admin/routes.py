@@ -4,7 +4,7 @@
 import os
 import time
 import re
-from app.forms.forms import LessonForm, CategoryForm, LessonFileUploadForm
+from app.forms.forms import LessonForm, CategoryForm
 from functools import wraps
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify
 from flask_login import login_required, current_user
@@ -131,9 +131,8 @@ def delete_category(category_id):
 def new_lesson():
     """Create a new lesson entry."""
     form = LessonForm()
-    upload_form = LessonFileUploadForm()
     lesson = Lesson()
-    return lesson_form(lesson, form, upload_form)
+    return lesson_form(lesson, form)
 
 
 @admin_bp.route('/lesson/edit/<int:lesson_id>', methods=['GET', 'POST'])
@@ -143,11 +142,10 @@ def edit_lesson(lesson_id):
     """Edit an existing lesson."""
     lesson = Lesson.query.get_or_404(lesson_id)
     form = LessonForm(obj=lesson)
-    upload_form = LessonFileUploadForm()
-    return lesson_form(lesson, form, upload_form)
+    return lesson_form(lesson, form)
 
 
-def lesson_form(lesson, form, upload_form=None):
+def lesson_form(lesson, form):
     """Populate lesson fields from form and optionally upload resources."""
     form.category.choices = [(c.id, c.name) for c in Category.query.order_by(Category.name)]
 
@@ -160,36 +158,42 @@ def lesson_form(lesson, form, upload_form=None):
         db.session.flush()  # Ensure lesson.id is available
 
         # Handle resource upload
-        if upload_form and upload_form.validate_on_submit():
-            display_name = upload_form.display_name.data.strip() or filename
-
-
-            if upload_form.worksheet_file.data:
-                worksheet = upload_form.worksheet_file.data
+        for subform in form.files.entries:
+            if (
+                not subform.worksheet_file.data
+                and not subform.answer_key_file.data
+            ):
+                continue
+            display_name = subform.display_name.data.strip()
+            if subform.worksheet_file.data:
+                worksheet = subform.worksheet_file.data
                 filename = safe_filename(worksheet.filename)
                 path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                 worksheet.save(path)
-                lesson.files.append(LessonFile(
-                    filename=filename,
-                    display_name=display_name,
-                    file_type='worksheet'
-                ))
-
-            if upload_form.answer_key_file.data:
-                answer_key = upload_form.answer_key_file.data
+                lesson.files.append(
+                    LessonFile(
+                        filename=filename,
+                        display_name=display_name or filename,
+                        file_type='worksheet',
+                    )
+                )
+            if subform.answer_key_file.data:
+                answer_key = subform.answer_key_file.data
                 filename = safe_filename(answer_key.filename)
                 path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                 answer_key.save(path)
-                lesson.files.append(LessonFile(
-                    filename=filename,
-                    display_name=display_name,
-                    file_type='answer_key'
-                ))
+                lesson.files.append(
+                    LessonFile(
+                        filename=filename,
+                        display_name=display_name or filename,
+                        file_type='answer_key',
+                    )
+                )
 
         db.session.commit()
         return redirect(url_for('admin.admin_home'))
 
-    return render_template('admin/new_lesson.html', form=form, lesson=lesson, upload_form=upload_form or LessonFileUploadForm())
+    return render_template('admin/new_lesson.html', form=form, lesson=lesson)
 
 
 # File Delete (traditional form)
